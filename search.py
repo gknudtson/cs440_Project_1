@@ -93,15 +93,20 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     unexplored_states = util.Stack()
     visited = set()
     unexplored_states.push((problem.getStartState(), []))
+
     while not unexplored_states.isEmpty():
         state, path = unexplored_states.pop()
+
         if problem.isGoalState(state):
             return path
+
         if state not in visited:
             visited.add(state)
+
             for successor, action, cost in problem.getSuccessors(state):
                 new_path = path + [action]
                 unexplored_states.push((successor, new_path))
+
     return []
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
@@ -124,7 +129,30 @@ def nullHeuristic(state, problem=None) -> float:
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    unexplored_states = util.PriorityQueue()
+    visited = set()
+    best_costs = {}
+    unexplored_states.push((problem.getStartState(), [], 0), 0)
+
+    while not unexplored_states.isEmpty():
+        state, path, cost = unexplored_states.pop()
+
+        if problem.isGoalState(state):
+            return path
+
+        if state not in visited or cost < best_costs[state]:
+            visited.add(state)
+            best_costs[state] = cost
+
+            for successor, action, step_cost in problem.getSuccessors(state):
+                new_path = path + [action]
+                new_cost = cost + step_cost
+                f_cost = new_cost + heuristic(successor, problem)
+                unexplored_states.update((successor, new_path, new_cost), f_cost)
+
+    return []
+
+
 
 # Abbreviations
 bfs = breadthFirstSearch
